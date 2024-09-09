@@ -1,0 +1,18 @@
+.
+├── ginServer
+│   ├── SetupGinServer.go
+│   ├── StartGinServer.go
+│   └── StopGinServer.go
+├── go.mod
+├── go.sum
+├── logger
+│   └── Logger.go
+├── main.go
+├── mongodb
+│   └── ConnectMongoDB.go
+├── postgres
+│   ├── ConnectPostgresDB.go
+│   └── ConnectPostgresGORM.go
+└── tree.txt
+
+5 directories, 11 files
