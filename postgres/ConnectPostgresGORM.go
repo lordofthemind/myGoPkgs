@@ -20,6 +20,15 @@ import (
 // Returns:
 // - *gorm.DB: A pointer to the GORM DB instance on a successful connection.
 // - error: An error if the connection fails after all retries.
+// ctx := context.Background()
+// dsn := "postgres://username:password@localhost:5432/dbname?sslmode=disable"
+// timeout := 30 * time.Second
+// maxRetries := 3
+// db, err := mypkg.ConnectPostgresGormDB(ctx, dsn, timeout, maxRetries)
+//
+//	if err != nil {
+//		log.Fatalf("Error connecting to the database: %v", err)
+//	}
 func ConnectToPostgreSQLGormDB(ctx context.Context, dsn string, timeout time.Duration, maxRetries int) (*gorm.DB, error) {
 	// Set a timeout for the connection operation using the context
 	ctx, cancel := context.WithTimeout(ctx, timeout)
@@ -59,13 +68,3 @@ func ConnectToPostgreSQLGormDB(ctx context.Context, dsn string, timeout time.Dur
 	// Return error if all retries fail
 	return nil, fmt.Errorf("failed to connect to PostgreSQL after %d retries: %w", maxRetries, err)
 }
-
-// ctx := context.Background()
-// dsn := "postgres://username:password@localhost:5432/dbname?sslmode=disable"
-// timeout := 30 * time.Second
-// maxRetries := 3
-
-// db, err := mypkg.ConnectPostgresGormDB(ctx, dsn, timeout, maxRetries)
-// if err != nil {
-// 	log.Fatalf("Error connecting to the database: %v", err)
-// }
