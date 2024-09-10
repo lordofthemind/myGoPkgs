@@ -1,4 +1,4 @@
-package postgres
+package mygopkgs
 
 import (
 	"context"
@@ -10,24 +10,31 @@ import (
 	"gorm.io/gorm"
 )
 
-// ConnectPostgresGormDB establishes a connection to the PostgreSQL database with GORM,
-// retries if necessary, and ensures the `uuid-ossp` extension is enabled.
-// Parameters:
-// - ctx: The context to control cancellation and timeouts.
-// - dsn: The Data Source Name (DSN) or database URL required to connect to the PostgreSQL database.
-// - timeout: The maximum duration to wait before giving up on connecting.
-// - maxRetries: The number of times to retry connecting in case of failure.
-// Returns:
-// - *gorm.DB: A pointer to the GORM DB instance on a successful connection.
-// - error: An error if the connection fails after all retries.
-// ctx := context.Background()
-// dsn := "postgres://username:password@localhost:5432/dbname?sslmode=disable"
-// timeout := 30 * time.Second
-// maxRetries := 3
-// db, err := mypkg.ConnectPostgresGormDB(ctx, dsn, timeout, maxRetries)
+// ConnectToPostgreSQLGormDB establishes a connection to the PostgreSQL database using GORM,
+// with automatic retry logic and context-based timeout handling. It ensures that the
+// `uuid-ossp` extension is enabled in the database upon successful connection.
 //
+// Parameters:
+//   - ctx: A context to control the connection's cancellation and timeout.
+//   - dsn: The Data Source Name (DSN), typically the database connection string.
+//   - timeout: The total duration allowed for the connection attempts before timing out.
+//   - maxRetries: The maximum number of connection attempts in case of failure.
+//
+// Returns:
+//   - *gorm.DB: A pointer to the GORM DB instance if the connection is successful.
+//   - error: An error describing the failure if the connection cannot be established
+//     within the given number of retries.
+//
+// Example usage:
+//
+//	ctx := context.Background()
+//	dsn := "postgres://username:password@localhost:5432/dbname?sslmode=disable"
+//	timeout := 30 * time.Second
+//	maxRetries := 3
+//
+//	db, err := ConnectToPostgreSQLGormDB(ctx, dsn, timeout, maxRetries)
 //	if err != nil {
-//		log.Fatalf("Error connecting to the database: %v", err)
+//	    log.Fatalf("Error connecting to the database: %v", err)
 //	}
 func ConnectToPostgreSQLGormDB(ctx context.Context, dsn string, timeout time.Duration, maxRetries int) (*gorm.DB, error) {
 	// Set a timeout for the connection operation using the context
@@ -55,7 +62,6 @@ func ConnectToPostgreSQLGormDB(ctx context.Context, dsn string, timeout time.Dur
 			if err == nil {
 				// Successfully connected, enable the uuid-ossp extension if necessary
 				log.Println("Connected to PostgreSQL using GORM successfully")
-
 				return db, nil // Return the connected DB instance
 			}
 

@@ -1,4 +1,4 @@
-package logger
+package mygopkgs
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// LoggerSetUpLoggerFile sets up logging to both a file and stdout.
+// SetUpLoggerFile sets up logging to both a file and stdout.
 //
 // It creates a "logs" directory if it doesn't already exist. It generates a log file name
 // based on the current date and time and opens this file for appending. The function configures
@@ -28,12 +28,12 @@ import (
 //
 // Example usage:
 //
-//	logFile, err := logger.LoggerSetUpLoggerFile("app.log")
+//	logFile, err := logger.SetUpLoggerFile("app.log")
 //	if err != nil {
 //	    log.Fatalf("Failed to set up logger: %v", err)
 //	}
 //	defer logFile.Close() // Ensure to close the log file when the application exits
-func LoggerSetUpLoggerFile(logFileName string) (*os.File, error) {
+func SetUpLoggerFile(logFileName string) (*os.File, error) {
 	// Ensure the logs directory exists
 	if err := os.MkdirAll("logs", 0755); err != nil {
 		return nil, fmt.Errorf("failed to create logs directory: %w", err)

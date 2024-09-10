@@ -1,4 +1,4 @@
-package postgres
+package mygopkgs
 
 import (
 	"context"
@@ -10,16 +10,33 @@ import (
 	_ "github.com/lib/pq" // Import the PostgreSQL driver
 )
 
-// ConnectPostgresDB establishes a connection to the PostgreSQL database using `database/sql`,
-// retries if necessary, and returns a connection pool.
+// ConnectPostgresDB establishes a connection to the PostgreSQL database using the `database/sql` package,
+// with retry and context-based timeout handling. It provides a connection pool that can be used
+// for database operations throughout the application's lifetime.
+//
 // Parameters:
-// - ctx: The context to control cancellation and timeouts.
-// - dsn: The Data Source Name (DSN) or database URL required to connect to the PostgreSQL database.
-// - timeout: The maximum duration to wait before giving up on connecting.
-// - maxRetries: The number of times to retry connecting in case of failure.
+//   - ctx: A context to control the connection's cancellation and timeout.
+//   - dsn: The Data Source Name (DSN), typically the database connection string.
+//   - timeout: The total duration allowed for the connection attempts before timing out.
+//   - maxRetries: The maximum number of connection attempts in case of failure.
+//
 // Returns:
-// - *sql.DB: A pointer to the database connection pool on a successful connection.
-// - error: An error if the connection fails after all retries.
+//   - *sql.DB: A pointer to the database connection pool if the connection is successful.
+//   - error: An error describing the failure if the connection cannot be established
+//     within the given number of retries.
+//
+// Example usage:
+//
+//	ctx := context.Background()
+//	dsn := "postgres://username:password@localhost:5432/dbname?sslmode=disable"
+//	timeout := 30 * time.Second
+//	maxRetries := 3
+//
+//	db, err := ConnectPostgresDB(ctx, dsn, timeout, maxRetries)
+//	if err != nil {
+//	    log.Fatalf("Error connecting to the database: %v", err)
+//	}
+//	defer db.Close() // Always ensure to close the database connection when done
 func ConnectPostgresDB(ctx context.Context, dsn string, timeout time.Duration, maxRetries int) (*sql.DB, error) {
 	// Set a timeout for the connection operation using the context
 	ctx, cancel := context.WithTimeout(ctx, timeout)
@@ -61,15 +78,3 @@ func ConnectPostgresDB(ctx context.Context, dsn string, timeout time.Duration, m
 	// Return error if all retries fail
 	return nil, fmt.Errorf("failed to connect to PostgreSQL after %d retries: %w", maxRetries, err)
 }
-
-// ctx := context.Background()
-// dsn := "postgres://username:password@localhost:5432/dbname?sslmode=disable"
-// timeout := 30 * time.Second
-// maxRetries := 3
-
-// db, err := postgres.ConnectPostgresDB(ctx, dsn, timeout, maxRetries)
-// if err != nil {
-// 	log.Fatalf("Error connecting to the database: %v", err)
-// }
-
-// defer db.Close() // Always ensure to close the database connection when done

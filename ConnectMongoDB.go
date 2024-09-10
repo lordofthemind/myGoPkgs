@@ -1,4 +1,4 @@
-package mongodb
+package mygopkgs
 
 import (
 	"context"
@@ -10,17 +10,35 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// ConnectMongoDB establishes a connection to the MongoDB database, retries if necessary,
-// and allows you to specify the connection string as a parameter.
+// ConnectToMongoDB establishes a connection to the MongoDB database using the official MongoDB Go driver,
+// with retry and context-based timeout handling. It returns a client and database instance
+// that can be used for subsequent MongoDB operations.
+//
 // Parameters:
-// - ctx: The context to control cancellation and timeouts.
-// - dsn: The MongoDB connection string (Data Source Name).
-// - timeout: The maximum duration to wait before giving up on connecting.
-// - maxRetries: The number of times to retry connecting in case of failure.
+//   - ctx: A context to control the connection's cancellation and timeout.
+//   - dsn: The MongoDB connection string (Data Source Name).
+//   - timeout: The total duration allowed for the connection attempts before timing out.
+//   - maxRetries: The maximum number of connection attempts in case of failure.
+//   - dbName: The name of the MongoDB database to connect to.
+//
 // Returns:
-// - *mongo.Client: A pointer to the MongoDB client instance on a successful connection.
-// - *mongo.Database: A pointer to the MongoDB database instance.
-// - error: An error if the connection fails after all retries.
+//   - *mongo.Client: A pointer to the MongoDB client instance if the connection is successful.
+//   - *mongo.Database: A pointer to the specific MongoDB database instance.
+//   - error: An error describing the failure if the connection cannot be established
+//     within the given number of retries.
+//
+// Example usage:
+//
+//	ctx := context.Background()
+//	dsn := os.Getenv("MONGO_DOCKER_CONNECTION_URL")
+//	timeout := 30 * time.Second
+//	maxRetries := 5
+//	dbName := "polyglot" // Replace with your actual database name
+//
+//	client, db, err := ConnectToMongoDB(ctx, dsn, timeout, maxRetries, dbName)
+//	if err != nil {
+//	    log.Fatalf("Error connecting to MongoDB: %v", err)
+//	}
 func ConnectToMongoDB(ctx context.Context, dsn string, timeout time.Duration, maxRetries int, dbName string) (*mongo.Client, *mongo.Database, error) {
 	// Set a timeout for the connection operation using the context
 	ctx, cancel := context.WithTimeout(ctx, timeout)
@@ -60,14 +78,3 @@ func ConnectToMongoDB(ctx context.Context, dsn string, timeout time.Duration, ma
 	// Return error if all retries fail
 	return nil, nil, fmt.Errorf("failed to connect to MongoDB after %d retries: %w", maxRetries, err)
 }
-
-// ctx := context.Background()
-// dsn := os.Getenv("MONGO_DOCKER_CONNECTION_URL")
-// timeout := 30 * time.Second
-// maxRetries := 5
-// dbName := "polyglot" // Replace with your actual database name
-
-// client, db, err := mypkg.ConnectMongoDB(ctx, dsn, timeout, maxRetries, dbName)
-// if err != nil {
-// 	log.Fatalf("Error connecting to MongoDB: %v", err)
-// }
